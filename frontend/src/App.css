@@ -1,0 +1,116 @@
+/* Additional styles for App component */
+.App {
+  text-align: center;
+}
+
+/* Animation for form submission */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-container,
+.users-container {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Loading spinner */
+.loading::after {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-left: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* File input styling improvements */
+.file-input-label {
+  position: relative;
+  overflow: hidden;
+}
+
+.file-input-label::before {
+  content: '📁';
+  margin-right: 8px;
+  font-size: 18px;
+}
+
+.file-input-label.has-file::before {
+  content: '✅';
+}
+
+/* Button hover effects */
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+/* Card hover effects */
+.user-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.user-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.user-card:hover::before {
+  left: 100%;
+}
+
+/* Responsive image handling */
+.user-image {
+  transition: transform 0.3s ease;
+}
+
+.user-card:hover .user-image {
+  transform: scale(1.05);
+}
+
+/* Form validation styles */
+.form-group input:invalid {
+  border-color: #dc3545;
+}
+
+.form-group input:valid {
+  border-color: #28a745;
+}
+
+/* Success and error message animations */
+.error,
+.success {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+} 

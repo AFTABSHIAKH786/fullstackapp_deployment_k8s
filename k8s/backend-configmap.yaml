@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: userapp
+data:
+  DB_HOST: postgres-service
+  DB_NAME: userdb
+  DB_PORT: "5432"
+  PORT: "5000" 
