@@ -1,0 +1,13 @@
+{{- if .Values.postgres.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "userapp.postgres.fullname" . }}-config
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "userapp.postgres.labels" . | nindent 4 }}
+data:
+  {{- range $key, $value := .Values.postgres.config }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+{{- end }} 

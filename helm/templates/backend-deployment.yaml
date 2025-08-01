@@ -1,0 +1,80 @@
+{{- if .Values.backend.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "userapp.backend.fullname" . }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    {{- include "userapp.backend.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.backend.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "userapp.backend.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "userapp.backend.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: backend
+          image: "{{ .Values.global.imageRegistry }}{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.backend.service.port }}
+              protocol: TCP
+          env:
+            - name: DB_USER
+              value: {{ .Values.postgres.config.POSTGRES_USER | quote }}
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "userapp.backend.fullname" . }}-config
+                  key: DB_HOST
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "userapp.backend.fullname" . }}-config
+                  key: DB_NAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "userapp.postgres.fullname" . }}-secret
+                  key: POSTGRES_PASSWORD
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "userapp.backend.fullname" . }}-config
+                  key: DB_PORT
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "userapp.backend.fullname" . }}-config
+                  key: PORT
+          volumeMounts:
+            - name: uploads-storage
+              mountPath: /app/uploads
+          {{- if .Values.backend.livenessProbe }}
+          livenessProbe:
+            {{- toYaml .Values.backend.livenessProbe | nindent 12 }}
+          {{- end }}
+          {{- if .Values.backend.readinessProbe }}
+          readinessProbe:
+            {{- toYaml .Values.backend.readinessProbe | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.backend.resources | nindent 12 }}
+      volumes:
+        - name: uploads-storage
+          {{- if eq .Values.backend.uploads.storage.type "emptyDir" }}
+          emptyDir: {}
+          {{- else if eq .Values.backend.uploads.storage.type "persistentVolumeClaim" }}
+          persistentVolumeClaim:
+            claimName: {{ include "userapp.backend.fullname" . }}-uploads-pvc
+          {{- end }}
+{{- end }} 
